@@ -138,7 +138,7 @@ def get_table(group):
         c = conn.cursor()
         c.execute("PRAGMA table_info({})".format(group))
         columns = c.fetchall()
-        columns = { entry[0]: entry[1] for entry in columns }
+        columns = [entry[1] for entry in columns ]
         return columns
     except Exception as e:
         print('Error: ', e)
