@@ -17,8 +17,7 @@ def add_member(req_data):
         return {"name": name}
 
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 def get_all_member(group):
     try:
@@ -28,8 +27,7 @@ def get_all_member(group):
         rows = c.fetchall()
         return { "count": len(rows), "members": rows }
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 
 def get_member(name, group):
@@ -40,8 +38,7 @@ def get_member(name, group):
         status = c.fetchone()[0]
         return status
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 
 def update_member(req_data):
@@ -57,8 +54,7 @@ def update_member(req_data):
         conn.commit()
         return {column: response}
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 def delete_member(req_data):
     name = req_data['name']
@@ -71,8 +67,7 @@ def delete_member(req_data):
         conn.commit()
         return {'name': name}
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 def add_column(req_data):
     column = req_data['column']
@@ -88,8 +83,7 @@ def add_column(req_data):
         return {"column": column}
 
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 
 def delete_column(req_data):
@@ -128,8 +122,7 @@ def delete_column(req_data):
         conn.commit()
         return {'column': column}
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}
 
 
 def get_table(group):
@@ -141,5 +134,4 @@ def get_table(group):
         columns = [entry[1] for entry in columns ]
         return columns
     except Exception as e:
-        print('Error: ', e)
-        return None
+        return {"error": str(e)}

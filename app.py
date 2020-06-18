@@ -11,28 +11,36 @@ if __name__ == '__main__':
 def add_member():
     req_data = request.get_json()
 
-    # Add item to the list
+    # Add member to database
     res_data = helper.add_member(req_data)
 
-    # Return error if item not added
-    if res_data is None:
-        response = Response("{'error': 'Member not added - " + req_data['name'] + "'}", status=400 , mimetype='application/json')
+    # Return error if exception is raised
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
-@app.route('/member/all')
+@app.route('/member/all', methods=['GET'])
 def get_all_member():
 
     group = request.args.get('group')
     res_data = helper.get_all_member(group)
 
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
 
 @app.route('/member', methods=['GET'])
 def get_member():
@@ -44,17 +52,20 @@ def get_member():
     status = helper.get_member(name, group)
 
     # Return 404 if item not found
-    if status is None:
-        response = Response("{'error': 'Member Not Found - %s'}"  % name, status=404 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
-    # Return status
     res_data = {
-        'name': name
+        'member': status
     }
 
+    # Return response
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
 
 @app.route('/member/update', methods=['PUT'])
 def update_member():
@@ -64,13 +75,14 @@ def update_member():
     res_data = helper.update_member(req_data)
 
     # Return error if the status could not be updated
-    if res_data is None:
-        response = Response("{'error': 'Error updating member - '" + req_data['name'] + "}", status=400 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 
@@ -82,13 +94,14 @@ def delete_member():
     res_data = helper.delete_member(req_data)
 
     # Return error if the item could not be deleted
-    if res_data is None:
-        response = Response("{'error': 'Error deleting member - '" + req_data['name'] +  "}", status=400 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 
@@ -100,13 +113,14 @@ def add_column():
     res_data = helper.add_column(req_data)
 
     # Return error if item not added
-    if res_data is None:
-        response = Response("{'error': 'Column not added - " + req_data['column'] + "'}", status=400 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 
@@ -117,13 +131,14 @@ def delete_column():
     res_data = helper.delete_column(req_data)
 
     # Return error if item not added
-    if res_data is None:
-        response = Response("{'error': 'Error deleting column - " + req_data['column'] + "'}", status=400 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
     # Return response
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 
@@ -136,14 +151,17 @@ def get_table():
     columns = helper.get_table(group)
 
     # Return 404 if item not found
-    if columns is None:
-        response = Response("{'error': 'Table Not Found - %s'}"  % group, status=404 , mimetype='application/json')
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
-    # Return status
     res_data = {
         'table': columns
     }
 
+    # Return response
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+    
