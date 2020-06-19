@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=5000, debug=True)
+    app.run(threaded=True, port=5000)
 
 @app.route('/member/new', methods=['POST'])
 def add_member():
@@ -164,6 +164,6 @@ def get_table():
 
     # Return response
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
-    
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
     
