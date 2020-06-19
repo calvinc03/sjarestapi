@@ -1,10 +1,10 @@
 import helper
 from flask import Flask, request, Response
-# from flask_cors import CORS
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 if __name__ == '__main__':
     app.run(threaded=True, port=5000)
