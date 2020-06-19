@@ -1,11 +1,13 @@
 import helper
 from flask import Flask, request, Response
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
+CORS(app)
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=5000)
+    app.run(threaded=True, port=5000, debug=True)
 
 @app.route('/member/new', methods=['POST'])
 def add_member():
@@ -151,7 +153,7 @@ def get_table():
     columns = helper.get_table(group)
 
     # Return 404 if item not found
-    if 'error' in res_data:
+    if 'error' in columns:
         response = Response(json.dumps(res_data), status=400, mimetype='application/json')
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
@@ -162,6 +164,6 @@ def get_table():
 
     # Return response
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    
     return response
     
