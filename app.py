@@ -154,7 +154,7 @@ def get_table():
 
     # Return 404 if item not found
     if 'error' in columns:
-        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response = Response(json.dumps(columns), status=400, mimetype='application/json')
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 
