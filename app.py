@@ -88,6 +88,25 @@ def update_member():
     return response
 
 
+@app.route('/group/update', methods=['POST'])
+def update_group():
+
+    req_data = request.get_json()
+
+    res_data = helper.update_group(req_data)
+
+    # Return error if the status could not be updated
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    # Return response
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
 @app.route('/member/remove', methods=['DELETE'])
 def delete_member():
     req_data = request.get_json()

@@ -56,6 +56,30 @@ def update_member(req_data):
     except Exception as e:
         return {"error": str(e)}
 
+def update_group(req_data):
+    group = req_data['group']
+    data = [tuple(e) for e in req_data['data']]
+    length = req_data['length']
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+
+        c.execute('delete from {}'.format(group))
+        
+        s = ''
+        for i in range(length):
+            s += f'{data[i]}'
+            if (length - 1 != i):
+                s += ','
+
+        c.execute('insert into {} values {}'.format(group, s))
+        conn.commit()
+
+        return {'status': f'{group} updated'}
+    except Exception as e:
+        return {"error": str(e)}
+
 def delete_member(req_data):
     name = req_data['name']
     group = req_data['group']
