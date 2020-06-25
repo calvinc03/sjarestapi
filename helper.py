@@ -19,7 +19,7 @@ def add_members(req_data):
             if (length - 1 != i):
                 s += ','
 
-        c.execute('insert into {} (name, email) values {}'.format(group, s))
+        c.execute('insert into {} (Name, Email) values {}'.format(group, s))
         conn.commit()
         return {group: "Members Added"}
 
@@ -72,7 +72,7 @@ def delete_members(req_data):
 
         s = ''
         for i in range(length):
-            s += f'name="{members[i]}"'
+            s += f'Name="{members[i]}"'
             if (length - 1 != i):
                 s += ' or '
 
