@@ -141,4 +141,22 @@ def get_table():
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
+@app.route('/email', methods=['POST'])
+def send_email():
     
+    req_data = request.get_json()
+
+    # Get items from the helper
+    res_data = helper.send_email(req_data)
+
+    # Return 404 if item not found
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    # Return response
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response

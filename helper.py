@@ -1,4 +1,6 @@
 import sqlite3
+import smtplib
+from email.message import EmailMessage
 
 DB_PATH = './forms.db'   # Update this path accordingly
 
@@ -145,5 +147,34 @@ def get_table(group):
         columns = c.fetchall()
         columns = [entry[1] for entry in columns ]
         return columns
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def send_email(req_data):
+    members = req_data['members']
+
+    try:
+        with smtplib.SMTP('smtp-mail.outlook.com', 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+
+            smtp.login('calvin.chen@sjabcy.ca', 'Xeifoo4x')
+
+            for member in members:
+                msg = EmailMessage()
+                msg['Subject'] = 'Missing Fees and Forms'
+                msg['From'] = 'calvin.chen@sjabcy.ca'
+
+                forms = ''
+                for i in range(2, len(member)):
+                    forms += f'{member[i]}\n'
+                msg['To'] = f'{member[1]}'
+                content = f'Hi {member[0]},\n\nYou are missing the following forms:\n\n{forms}\n\nThanks,\nCalvin Chen'
+                msg.set_content(content)
+
+                smtp.send_message(msg)
+        return {"Emails": "Sent"}
     except Exception as e:
         return {"error": str(e)}
