@@ -6,7 +6,6 @@ DB_PATH = './forms.db'   # Update this path accordingly
 
 def add_members(req_data):
     members = [tuple(e) for e in req_data['members']]
-    group = req_data['group']
     length = req_data['length']
 
     try:
@@ -18,19 +17,21 @@ def add_members(req_data):
             s += f'{members[i]}'
             if (length - 1 != i):
                 s += ','
+        
+        print(s)
 
-        c.execute('insert into {} (Name, Email) values {}'.format(group, s))
+        c.execute('insert into members (Name, Email, `Group`) values {}'.format(s))
         conn.commit()
-        return {group: "Members Added"}
+        return {"Result": "Members Added"}
 
     except Exception as e:
         return {"error": str(e)}
 
-def get_all_member(group):
+def get_all_member():
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("select * from {}".format(group))
+        c.execute("select * from members")
         rows = c.fetchall()
         return { "count": len(rows), "members": rows }
     except Exception as e:
@@ -38,7 +39,6 @@ def get_all_member(group):
 
 
 def update_group(req_data):
-    group = req_data['group']
     data = [tuple(e) for e in req_data['data']]
     length = req_data['length']
 
@@ -46,7 +46,7 @@ def update_group(req_data):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        c.execute('delete from {}'.format(group))
+        c.execute('delete from members')
         
         s = ''
         for i in range(length):
@@ -54,16 +54,15 @@ def update_group(req_data):
             if (length - 1 != i):
                 s += ','
 
-        c.execute('insert into {} values {}'.format(group, s))
+        c.execute('insert into members values {}'.format(s))
         conn.commit()
 
-        return {'status': f'{group} updated'}
+        return {'status': 'members updated'}
     except Exception as e:
         return {"error": str(e)}
 
 def delete_members(req_data):
     members = req_data['members']
-    group = req_data['group']
     length = req_data['length']
 
     try:
@@ -76,25 +75,24 @@ def delete_members(req_data):
             if (length - 1 != i):
                 s += ' or '
 
-        c.execute("delete from {} where {}".format(group, s))
+        c.execute("delete from members where {}".format(s))
         conn.commit()
-        return {group: "Members Deleted"}
+        return {"Result": "Members Deleted"}
     except Exception as e:
         return {"error": str(e)}
 
 def add_columns(req_data):
-    column = req_data['column'].replace(" ", "_")
-    groups = req_data['groups']
+    columns = req_data['columns']
 
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        for group in groups:
-            c.execute('alter table {} add {} TEXT default "no"'.format(group, column))
+        for column in columns:
+            c.execute('alter table members add {} TEXT default "no"'.format(column.replace(" ", "_")))
 
         conn.commit()
-        return {"column": column}
+        return {"Added": columns}
 
     except Exception as e:
         return {"error": str(e)}
@@ -102,19 +100,18 @@ def add_columns(req_data):
 
 def delete_columns(req_data):
     columns = req_data['columns']
-    group = req_data['group']
 
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        c.execute("PRAGMA table_info({})".format(group))
+        c.execute("PRAGMA table_info(members)")
         column_names = []
         results = c.fetchall()
         for entry in results:
             if entry[1] not in columns:
                 columnstr = ''
-                columnstr += f'{entry[1]} {entry[2]}'
+                columnstr += f'"{entry[1]}" {entry[2]}'
                 if (int(entry[3]) == 1):
                     columnstr += ' not null'
                 if (int(entry[5]) == 1):
@@ -123,15 +120,16 @@ def delete_columns(req_data):
                 column_names.append(columnstr)
         
         column_names = ','.join(column_names)
+        print(column_names)
 
         c.execute('create table temp({})'.format(column_names))
 
-        results = [entry[1] for entry in results if entry[1] not in columns]
+        results = [f'"{entry[1]}"' for entry in results if entry[1] not in columns]
         results = ','.join(results)
-
-        c.execute('insert into temp select {} from {}'.format(results, group))
-        c.execute('drop table if exists {}'.format(group))
-        c.execute('alter table temp rename to {}'.format(group))
+        print(results)
+        c.execute('insert into temp select {} from members'.format(results))
+        c.execute('drop table if exists members')
+        c.execute('alter table temp rename to members')
 
         conn.commit()
         return {'deleted': columns}
@@ -139,11 +137,11 @@ def delete_columns(req_data):
         return {"error": str(e)}
 
 
-def get_table(group):
+def get_table():
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("PRAGMA table_info({})".format(group))
+        c.execute("PRAGMA table_info(members)")
         columns = c.fetchall()
         columns = [entry[1] for entry in columns ]
         return columns

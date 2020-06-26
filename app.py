@@ -30,8 +30,7 @@ def add_members():
 @app.route('/member/all', methods=['GET'])
 def get_all_member():
 
-    group = request.args.get('group')
-    res_data = helper.get_all_member(group)
+    res_data = helper.get_all_member()
 
     if 'error' in res_data:
         response = Response(json.dumps(res_data), status=400, mimetype='application/json')
@@ -121,11 +120,9 @@ def delete_columns():
 
 @app.route('/table', methods=['GET'])
 def get_table():
-    
-    group = request.args.get('group')
 
     # Get items from the helper
-    columns = helper.get_table(group)
+    columns = helper.get_table()
 
     # Return 404 if item not found
     if 'error' in columns:
