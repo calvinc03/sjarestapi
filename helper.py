@@ -31,7 +31,14 @@ def get_all_member():
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("select * from members")
+        c.execute("""select * from members 
+                        order by case 
+                            when `Group` = 'junior' then 1
+                            when `Group` = 'cadet two' then 2
+                            when `Group` = 'cadet one' then 3
+                            when `Group` = 'crusader' then 4
+                            when `Group` = 'leader' then 5 
+                        end;""")
         rows = c.fetchall()
         return { "count": len(rows), "members": rows }
     except Exception as e:
