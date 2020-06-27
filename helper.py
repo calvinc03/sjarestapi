@@ -21,8 +21,6 @@ def add_members(req_data):
             s += f'{members[i]}'
             if (length - 1 != i):
                 s += ','
-        
-        print(s)
 
         c.execute('insert into members (Name, Email, `Group`) values {}'.format(s))
         conn.commit()
@@ -140,13 +138,11 @@ def delete_columns(req_data):
                 column_names.append(columnstr)
         
         column_names = ','.join(column_names)
-        print(column_names)
 
         c.execute('create table temp({})'.format(column_names))
 
         results = [f'"{entry[1]}"' for entry in results if entry[1] not in columns]
         results = ','.join(results)
-        print(results)
         c.execute('insert into temp select {} from members'.format(results))
         c.execute('drop table if exists members')
         c.execute('alter table temp rename to members')
@@ -204,9 +200,8 @@ def login(req_data):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("select * from users where user='{}'".format(user_name))
+        c.execute("select * from users where user=?", (user_name, ))
         user_data = c.fetchone()
-        print(user_data)
 
         if user_data is None:
             return {"error": "User Not Found"}
@@ -214,7 +209,7 @@ def login(req_data):
         if bcrypt.check_password_hash(user_data[1], password):
             access_token = ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
             
-            c.execute("update users set access_token='{}' where user='{}'".format(access_token, user_data[0]))
+            c.execute("update users set access_token=? where user=?", (access_token, user_name))
             conn.commit()
 
             return {'access_token': access_token, 'permissions': user_data[3]}
@@ -224,18 +219,16 @@ def login(req_data):
         return {"error": str(e)}
 
 
-def auth(req_data):
-    token = req_data['access_token']
-
+def auth(token):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("select * from users where access_token='{}'".format(token))
+        c.execute("select * from users where access_token=?", (token, ))
         user_data = c.fetchone()
 
         if user_data is None:
             return {"error": "User Is Not Logged In"}
             
-        return {"success": "User Logged In"}
+        return {"success": "User is logged in", "permissions": user_data[3]}
     except Exception as e:
         return {"error": str(e)}
