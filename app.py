@@ -172,3 +172,40 @@ def send_email():
     response = Response(json.dumps(res_data), status=200, mimetype='application/json')
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
+@app.route("/login", methods=["POST"])
+def login():
+    req_data = request.get_json()
+
+    # Get items from the helper
+    res_data = helper.login(req_data)
+
+    # Return 404 if item not found
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    # Return response
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+@app.route("/auth", methods=["POST"])
+def auth():
+    req_data = request.get_json()
+
+    # Get items from the helper
+    res_data = helper.auth(req_data)
+
+    # Return 400 if item not found
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    # Return response
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response

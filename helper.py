@@ -1,8 +1,12 @@
 import sqlite3
 import smtplib
 from email.message import EmailMessage
+from flask_bcrypt import Bcrypt
+import random
+import string
 
-DB_PATH = './forms.db'   # Update this path accordingly
+DB_PATH = './forms.db'  
+bcrypt = Bcrypt()
 
 def add_members(req_data):
     members = [tuple(e) for e in req_data['members']]
@@ -190,5 +194,48 @@ def send_email(req_data):
 
                 smtp.send_message(msg)
         return {"Emails": "Sent"}
+    except Exception as e:
+        return {"error": str(e)}
+
+def login(req_data):
+    user_name = req_data['user'].lower()
+    password = req_data['pass']
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("select * from users where user='{}'".format(user_name))
+        user_data = c.fetchone()
+        print(user_data)
+
+        if user_data is None:
+            return {"error": "User Not Found"}
+
+        if bcrypt.check_password_hash(user_data[1], password):
+            access_token = ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+            
+            c.execute("update users set access_token='{}' where user='{}'".format(access_token, user_data[0]))
+            conn.commit()
+
+            return {'access_token': access_token, 'permissions': user_data[3]}
+
+        return {'error': 'Incorrect Password'}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def auth(req_data):
+    token = req_data['access_token']
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("select * from users where access_token='{}'".format(token))
+        user_data = c.fetchone()
+
+        if user_data is None:
+            return {"error": "User Is Not Logged In"}
+            
+        return {"success": "User Logged In"}
     except Exception as e:
         return {"error": str(e)}
