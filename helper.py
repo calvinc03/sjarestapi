@@ -44,6 +44,15 @@ def get_all_member():
     except Exception as e:
         return {"error": str(e)}
 
+def get_member_names():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""select Name from members""")
+        rows = [row[0] for row in c.fetchall()]
+        return { "names": rows }
+    except Exception as e:
+        return {"error": str(e)}
 
 def update_group(req_data):
     data = [tuple(e) for e in req_data['data']]

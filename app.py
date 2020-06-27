@@ -42,6 +42,21 @@ def get_all_member():
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
+@app.route('/member/names', methods=['GET'])
+def get_member_names():
+
+    res_data = helper.get_member_names()
+
+    if 'error' in res_data:
+        response = Response(json.dumps(res_data), status=400, mimetype='application/json')
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    # Return response
+    response = Response(json.dumps(res_data), status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
 
 @app.route('/group/update', methods=['POST'])
 def update_group():
